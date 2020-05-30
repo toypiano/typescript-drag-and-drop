@@ -6,12 +6,27 @@ import { ProjectItem } from './project-item';
 import { DragTarget } from '../models/draggable';
 import { autobind } from '../decorators/autobind';
 
+/**
+ * Helper function that converts ProjectStatus into a query string
+ * @param listType type of the project list
+ * @returns CSS query string for identifying the type of ProjectList instance
+ */
+function getListQuery(listType: ProjectStatus) {
+  let type;
+  if (listType === ProjectStatus.Active) type = 'active';
+  if (listType === ProjectStatus.Completed) type = 'completed';
+
+  return `project--${type}`;
+}
+
 export class ProjectList extends Component<HTMLElement, HTMLDivElement>
   implements DragTarget {
   private assignedProjects: Project[] = [];
-  // TODO - refactor type as ProjectStatus type and create functions that returns CSS query string
-  constructor(private type: 'active' | 'completed') {
-    super('project-list', 'app', false, `project--${type}`, `project--${type}`);
+
+  constructor(private type: ProjectStatus) {
+    // can't use 'this' until after super, so we can't use getter here
+    // you could use `project--${type === ProjectStatus.Active ? 'active' : 'completed'}` instead
+    super('project-list', 'app', false, getListQuery(type), getListQuery(type));
 
     this.configure();
     this.renderContent();
@@ -25,9 +40,9 @@ export class ProjectList extends Component<HTMLElement, HTMLDivElement>
   }
 
   renderContent() {
-    this.element.querySelector(
-      'h2',
-    )!.textContent = `${this.type.toUpperCase()} PROJECT`;
+    this.element.querySelector('h2')!.textContent = `${
+      ProjectStatus[this.type] // reverse mapping enum
+    } Project`;
   }
 
   @autobind
@@ -46,10 +61,7 @@ export class ProjectList extends Component<HTMLElement, HTMLDivElement>
     // also passing this list's type in order to handle the case where
     // project item is dragged and put back to where it was.
     if (projectId) {
-      state.moveProject(
-        projectId,
-        this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Completed,
-      );
+      state.moveProject(projectId, this.type);
     }
   }
 
@@ -61,11 +73,7 @@ export class ProjectList extends Component<HTMLElement, HTMLDivElement>
   @autobind
   private assignAndRenderProjects(projects: Project[]) {
     this.assignedProjects = projects.filter(
-      (project) =>
-        project.status ===
-        (this.type === 'active'
-          ? ProjectStatus.Active
-          : ProjectStatus.Completed),
+      (project) => project.status === this.type,
     );
 
     this.renderProjects();
@@ -77,12 +85,12 @@ export class ProjectList extends Component<HTMLElement, HTMLDivElement>
     ulElement.innerHTML = '';
 
     // attach id to the ul element
-    const listId = `projects--${this.type}`;
-    ulElement.id = listId;
+    const ulElementId = `projects--${this.type}`;
+    ulElement.id = ulElementId;
 
     // render project items into corresponding list
     for (const project of this.assignedProjects) {
-      new ProjectItem(listId, project);
+      new ProjectItem(ulElementId, project);
     }
   }
 }

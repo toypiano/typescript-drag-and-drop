@@ -1,6 +1,7 @@
 import { Component } from './base-component';
 import { state } from '../state/project-state';
 import { autobind } from '../decorators/autobind';
+import { Validatable, validate } from '../utils/validation';
 
 export class ProjectInput extends Component<HTMLFormElement, HTMLDivElement> {
   private titleInputElement: HTMLInputElement;
@@ -45,7 +46,33 @@ export class ProjectInput extends Component<HTMLFormElement, HTMLDivElement> {
     const descriptionValue = this.descriptionInputElement.value;
     const peopleValue = this.peopleInputElement.value;
 
-    return [titleValue, descriptionValue, +peopleValue];
+    if (this.validateInputValues(titleValue, descriptionValue, +peopleValue)) {
+      return [titleValue, descriptionValue, +peopleValue];
+    } else {
+      alert('Please enter valid input');
+    }
+  }
+
+  private validateInputValues(
+    titleValue: string,
+    descriptionValue: string,
+    peopleValue: number,
+  ) {
+    const title: Validatable = {
+      value: titleValue,
+      required: true,
+    };
+    const description: Validatable = {
+      value: descriptionValue,
+      minLength: 4,
+    };
+    const people: Validatable = {
+      value: peopleValue,
+      min: 2,
+      max: 5,
+    };
+
+    return validate(title, description, people);
   }
 
   private clearForm(): void {

@@ -6,6 +6,11 @@ import { autobind } from '../decorators/autobind';
 export class ProjectItem extends Component<HTMLLIElement, HTMLUListElement>
   implements Draggable {
   private project: Project;
+
+  private get persons() {
+    if (this.project.people === 1) return '1 person';
+    return this.project.people + ' people';
+  }
   /**
    * @param listId id of the <ul> element to render project item to
    * @param project contains project info to render into project item
@@ -25,8 +30,7 @@ export class ProjectItem extends Component<HTMLLIElement, HTMLUListElement>
   renderContent() {
     // Render project information into the element.
     this.element.querySelector('h2')!.innerText = this.project.title;
-    this.element.querySelector('h3')!.innerText =
-      this.project.people + ' people assigned';
+    this.element.querySelector('h3')!.innerText = this.persons + ' assigned';
     this.element.querySelector('p')!.innerText = this.project.description;
   }
 
