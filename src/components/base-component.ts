@@ -1,10 +1,12 @@
 /**
- * @template E Element imported from template
+ * @template E firstElementChild of imported template
  * @template H Host element to insert E to
  */
 export abstract class Component<E extends HTMLElement, H extends HTMLElement> {
   templateElement: HTMLTemplateElement;
+  /** @property firstElementChild of imported template */
   element: E;
+  /** @property Host element in the DOM to insert new elements*/
   hostElement: H;
 
   /**
@@ -20,11 +22,11 @@ export abstract class Component<E extends HTMLElement, H extends HTMLElement> {
     hostId: string,
     prepend: boolean,
     elementId?: string,
-    elementClass?: string
+    elementClass?: string,
   ) {
     // import element from the template with the given id
     this.templateElement = document.getElementById(
-      templateId
+      templateId,
     ) as HTMLTemplateElement;
     this.element = document.importNode(this.templateElement.content, true)
       .firstElementChild as E;
@@ -39,14 +41,13 @@ export abstract class Component<E extends HTMLElement, H extends HTMLElement> {
 
     // insert element to host
     this.hostElement = document.getElementById(hostId) as H;
-    console.log(hostId, this.hostElement, document);
     this.insert(prepend);
   }
 
   private insert(prepend: boolean) {
     this.hostElement.insertAdjacentElement(
       prepend ? 'afterbegin' : 'beforeend',
-      this.element
+      this.element,
     );
   }
 

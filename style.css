@@ -67,9 +67,17 @@ button:active {
   border-color: var(--cl-red-dark);
 }
 
+#app {
+  width: 100vw;
+  display: grid;
+  place-items: center;
+}
+
 .projects {
   margin: 1rem;
   border: 1px solid var(--cl-red);
+  width: 90%;
+  max-width: 35rem;
 }
 
 .projects header {
@@ -133,4 +141,7 @@ button:active {
   padding: 1rem;
   border: 1px solid var(--cl-red);
   background: var(--cl-light);
+  margin-top: 2em;
+  width: 90%;
+  max-width: 35rem;
 }
